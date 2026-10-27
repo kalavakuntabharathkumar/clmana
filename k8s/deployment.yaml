@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: claims-anomaly-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: claims-anomaly-api
+  template:
+    metadata:
+      labels:
+        app: claims-anomaly-api
+    spec:
+      containers:
+        - name: api
+          image: claims-anomaly-api:local
+          ports:
+            - containerPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: claims-anomaly-api
+spec:
+  selector:
+    app: claims-anomaly-api
+  ports:
+    - port: 8000
+      targetPort: 8000
+  type: ClusterIP
